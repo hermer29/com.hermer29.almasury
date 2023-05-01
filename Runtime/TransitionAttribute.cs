@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace StateMachines.Runtime
+namespace Hermer29.Almasury
 {
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+    [AttributeUsage(AttributeTargets.Method)]
     public class TransitionAttribute : Attribute
     {
         public readonly Type To;

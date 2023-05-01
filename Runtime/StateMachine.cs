@@ -1,84 +1,32 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using UnityEngine.Assertions;
 
-namespace StateMachines.Runtime
+namespace Hermer29.Almasury
 {
     public class StateMachine
     {
         private readonly State[] _states;
+        private readonly TransitionMethodsBinder _transitionMethodsBinder;
         private State _current;
-        private Dictionary<Type, MethodInfo[]> _transitionMethods;
+        private bool _logging;
 
-        public StateMachine(int firstStateIndex, params State[] states)
+        public StateMachine(DiContainer container)
         {
-            _states = states;
-            _current = states[firstStateIndex];
+            _logging = container._logging;
+            var injected = new InjectedContainer(container);
+            _states = injected.GetStates().ToArray();
+            _current = injected.GetFirst();
+            _transitionMethodsBinder = new TransitionMethodsBinder(_states);
         }
         
-        public StateMachine(params State[] states) : this(0, states)
-        {
-        }
-
         public void OnEnable()
         {
-            foreach (var state in _states)
+            foreach (State state in _states)
             {
                 state.Initialize();
             }
-            AssignTransitionMethods();
             _current.Enter();
-        }
-
-        private void AssignTransitionMethods()
-        {
-            if (_transitionMethods == null)
-            {
-                _transitionMethods = new Dictionary<Type, MethodInfo[]>();
-                foreach (var state in _states.Select(x => x.GetType()).GroupBy(x => x))
-                {
-                    _transitionMethods.Add(state.Key, GetTransitionMethods(state.Key));
-                }
-
-                AssertThatTransitionMethodsIsValid();
-            }
-        }
-
-        private void AssertThatTransitionMethodsIsValid()
-        {
-            foreach (var stateTypeWithMethods in _transitionMethods)
-            {
-                foreach (var transitionMethod in stateTypeWithMethods.Value)
-                {
-                    var stateType = transitionMethod.GetCustomAttribute<TransitionAttribute>().To;
-                    if(_states.All(x => stateType != x.GetType()))
-                    {
-                        throw new InvalidOperationException(
-                            $"State {stateTypeWithMethods.Key} define transition method {transitionMethod.Name} with transition to {stateType}, which is not presented in state machine!");
-                    }
-                }
-            }
-        }
-
-        private MethodInfo[] GetTransitionMethods(Type state)
-        {
-            var methods = state.GetMethods()
-                .Where(x => x.GetCustomAttribute<TransitionAttribute>() != null)
-                .ToArray();
-            
-            foreach (var method in methods)
-            {
-                if (method.ReturnParameter.ParameterType != typeof(bool))
-                {
-                    Debug.LogError($"Invalid method ({method.Name}) defined in type {method.DeclaringType.Name}. " +
-                                   $"Methods defined with TransitionAttribute must be predicates");
-                }
-            }
-
-            return methods;
         }
 
         public void OnDisable()
@@ -87,34 +35,19 @@ namespace StateMachines.Runtime
             {
                 state.OnDisable();
             }
-            _transitionMethods.Clear();
-            _transitionMethods = null;
         }
 
         public void Update(float deltaTime)
         {
-            var transitionTarget = GetTransitionTarget(_current);
-            if (transitionTarget != null)
+            if (_transitionMethodsBinder.IsTransitionRequired(_current, out Type target))
             {
+                if(_logging)
+                    Debug.Log($"[Almasure] Started transition from {_current} to {target}");
                 _current.Exit();
-                _current = _states.First(x => x.GetType() == transitionTarget);
+                _current = _states.First(x => x.GetType() == target);
                 _current.Enter();
             }
             _current.Update(deltaTime);
-        }
-
-        private Type GetTransitionTarget(object state)
-        {
-            var methods = _transitionMethods[state.GetType()];
-            foreach (var method in methods)
-            {
-                if ((bool) method.Invoke(state, Array.Empty<object>()))
-                {
-                    return method.GetCustomAttribute<TransitionAttribute>().To;
-                }
-            }
-
-            return null;
         }
     }
 }

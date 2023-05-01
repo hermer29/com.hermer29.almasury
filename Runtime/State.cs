@@ -1,9 +1,7 @@
 ﻿using System;
-using UnityEngine;
 
-namespace StateMachines.Runtime
+namespace Hermer29.Almasury
 {
-    [Serializable]
     public class State
     {
         private bool _currentlyUsing;
