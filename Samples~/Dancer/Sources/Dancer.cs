@@ -10,7 +10,6 @@ namespace Hermer29.Almasury.Samples
         [SerializeField] private float _timeOffset;
         [SerializeField] private float _radius = 2;
         [SerializeField] private float _waitingTime = .5f;
-        [SerializeField] private bool _inverse;
 
         protected override void Install()
         {
@@ -32,11 +31,6 @@ namespace Hermer29.Almasury.Samples
         private float GetTime()
         {
             return Time.time + _timeOffset;
-        }
-
-        private int GetInverseModifier()
-        {
-            return _inverse ? -1 : 1;
         }
     }
 }
