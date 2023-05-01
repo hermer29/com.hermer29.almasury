@@ -1,6 +1,6 @@
 {
   "name": "com.hermer29.almasury",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "displayName": "Almasury",
   "type": "library",
   "description": "Finite state machine framework for unity",
