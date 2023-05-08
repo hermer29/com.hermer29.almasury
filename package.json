@@ -4,5 +4,12 @@
   "displayName": "Almasury",
   "type": "library",
   "description": "Finite state machine framework for unity",
-  "license": "MIT"
+  "license": "MIT",
+  "samples": [
+    {
+      "displayName": "Playtesting Sample",
+      "description": "Contains an example of how to use the library",
+      "path": "Samples~/Dancer"
+    }
+  ]
 }
