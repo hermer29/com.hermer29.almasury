@@ -1,0 +1,16 @@
+﻿{
+  "name": "Hermer29.Almasury.Samples.Dancer",
+  "rootNamespace": "",
+  "references": [
+    "GUID:ef7e0e3eb213f324c87b70a782844fb7"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
